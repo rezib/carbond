@@ -1,0 +1,9 @@
+config.h
+config.log
+config.status
+stamp-h1
+etc/carbon.conf
+src/.deps
+src/carbond
+*Makefile
+*.o

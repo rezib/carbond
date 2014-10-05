@@ -1,0 +1,6 @@
+STORAGE_DIR = @localstatedir@
+CONF_DIR    = @sysconfdir@
+
+LINE_RECEIVER_PORT = 2003
+
+UDP_RECEIVER_PORT = 2003
