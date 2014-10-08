@@ -26,16 +26,14 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include "log.h"
+
 #ifndef SYSCONFDIR
 #    define SYSCONFDIR "/etc/carbon"
 #endif
 #ifndef LOCALSTATEDIR
 #    define LOCALSTATEDIR "/var/lib/carbon"
 #endif
-
-#define debug(M, ...) \
-    if (conf->debug == true) \
-        printf("DEBUG %s:%s:%d: " M "\n", __FILE__, __FUNCTION__, __LINE__, ##__VA_ARGS__)
 
 #define METRIC_NAME_MAX_LEN 100
     
@@ -119,8 +117,10 @@ struct carbon_conf_s {
     char *storage_dir;
     int line_receiver_port;
     int udp_receiver_port;
-    bool debug;
     bool run; /* should the app keeps running or stop? */
+    /* flag to print file, function and line number in debug() */
+    bool tracing;
+    log_level_t log_level;
 };
 
 typedef struct carbon_conf_s carbon_conf_t;

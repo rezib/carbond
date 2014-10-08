@@ -57,8 +57,9 @@ void default_conf() {
 
     conf->run = true;
 
-    /* debug message */
-    conf->debug = false;
+    /* log level */
+    conf->tracing = false;
+    conf->log_level = LOG_LEVEL_INFO;
 
     /* config directory path */
     conf->conf_dir = malloc(sizeof(char)*PATH_MAX);
@@ -93,7 +94,8 @@ void print_conf() {
     debug("  conf_dir: %s", conf->conf_dir);
     debug("  conf_file: %s", conf->conf_file);
     debug("  storage_dir: %s", conf->storage_dir);
-    debug("  debug: %d", conf->debug);
+    debug("  tracing: %d", conf->tracing);
+    debug("  log_level: %d", conf->log_level);
     debug("  line_receiver_port: %d", conf->line_receiver_port);
     debug("  udp_receiver_port: %d", conf->udp_receiver_port);
 
@@ -131,7 +133,8 @@ void parse_args(int argc, char * argv[]) {
                 strncpy(conf->conf_file, optarg, strlen(optarg));
                 break;
             case 'd':
-                conf->debug = true;
+                conf->tracing = true;
+                conf->log_level = LOG_LEVEL_DEBUG;
                 break;
             default: /* never gets here */
                 break;
@@ -196,10 +199,8 @@ int main(int argc, char *argv[]) {
         return EXIT_FAILURE;
     }
 
-    if (conf->debug) {
-        print_conf();
-        print_storage_schema();
-    }
+    print_conf();
+    print_storage_schema();
 
     check_whisper_sizes();
 
