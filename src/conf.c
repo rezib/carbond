@@ -245,8 +245,8 @@ int conf_parse_storage_aggregation_file () {
     fh = fopen(filepath, "r");
 
     if (!fh) {
-        fprintf(stderr, "error while opening file %s: %s\n",
-                filepath, strerror(errno));
+        error("error while opening file %s: %s\n",
+              filepath, strerror(errno));
         return 1;
     }
 
@@ -320,8 +320,8 @@ int conf_parse_storage_schema_file() {
     fh = fopen(filepath, "r");
 
     if (!fh) {
-        fprintf(stderr, "error while opening file %s: %s\n",
-                filepath, strerror(errno));
+        error("error while opening file %s: %s\n",
+              filepath, strerror(errno));
         return 1;
     }
 
@@ -380,7 +380,7 @@ int conf_parse_carbon_file() {
     conf_fh = fopen(conf->conf_file, "r");
 
     if (!conf_fh) {
-        fprintf(stderr, "error while opening file %s: %s\n", conf->conf_file, strerror(errno));
+        error("error while opening file %s: %s\n", conf->conf_file, strerror(errno));
         return 1;
     }
 
@@ -417,7 +417,7 @@ int conf_parse_carbon_file() {
                     switch(errno) {
                         case EINVAL:
                         case ERANGE:
-                            fprintf(stderr, "problem while setting LINE_RECEIVER_PORT: %s\n", strerror(errno));
+                            error("problem while setting LINE_RECEIVER_PORT: %s\n", strerror(errno));
                             return 1;
                     }
             }
@@ -429,13 +429,13 @@ int conf_parse_carbon_file() {
                     switch(errno) {
                         case EINVAL:
                         case ERANGE:
-                            fprintf(stderr, "problem while setting UDP_RECEIVER_PORT: %s\n", strerror(errno));
+                            error("problem while setting UDP_RECEIVER_PORT: %s\n", strerror(errno));
                             return 1;
                     }
             }
 
             else {
-                fprintf(stderr, "conf: unknown key in configuration file: %s\n", cnf_key);
+                error("conf: unknown key in configuration file: %s\n", cnf_key);
                 return 1;
             }
 

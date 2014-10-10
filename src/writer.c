@@ -115,7 +115,7 @@ carbon_thread_t launch_writer_thread() {
     w_thd_args->id_thread = 0;
 
     if (pthread_create(&thread.pthread, NULL, writer_thread, (void*)w_thd_args) != 0) {
-        fprintf(stderr, "error on pthread_create: %s\n", strerror(errno));
+        error("error on pthread_create: %s\n", strerror(errno));
         exit(1);
     }
 

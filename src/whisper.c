@@ -177,7 +177,7 @@ static inline uint32_t archive_offset_end(archive_info_t *arch_info) {
 static inline int whisper_seek(int whisper_fd, int offset) {
 
     if (lseek(whisper_fd, offset , SEEK_SET) < 0) {
-        fprintf(stderr, "error while seeking file: %s\n", strerror(errno));
+        error("error while seeking file: %s\n", strerror(errno));
         return EXIT_FAILURE;
     }
 
@@ -198,7 +198,7 @@ static whisper_metadata_t * whisper_read_metadata(int whisper_fd) {
     wsp_md = calloc(1, WHISPER_HEADER_SIZE);
 
     if(read(whisper_fd, wsp_md, WHISPER_HEADER_SIZE) < 0) {
-        fprintf(stderr, "error while reading file: %s\n", strerror(errno));
+        error("error while reading file: %s\n", strerror(errno));
         free(wsp_md);
         wsp_md = NULL;
         return NULL;
@@ -226,7 +226,7 @@ static archive_info_t * whisper_read_archive_info(int whisper_fd, int archive_id
     arch_info = calloc(1, WHISPER_ARCHIVE_SIZE);
 
     if (read(whisper_fd, arch_info, WHISPER_ARCHIVE_SIZE) < 0) {
-        fprintf(stderr, "error while reading file: %s\n", strerror(errno));
+        error("error while reading file: %s\n", strerror(errno));
         free(arch_info);
         return NULL;
     }
@@ -246,12 +246,12 @@ static archive_point_t * whisper_read_archive_point(int whisper_fd) {
     archive_point_t *arch_pt = calloc(1, WHISPER_POINT_SIZE);
 
     if (read(whisper_fd, &(arch_pt->timestamp), sizeof(uint32_t)) < 0) {
-        fprintf(stderr, "error while reading file: %s\n", strerror(errno));
+        error("error while reading file: %s\n", strerror(errno));
         return NULL;
     }
 
     if (read(whisper_fd, &(arch_pt->value), sizeof(double)) < 0) {
-        fprintf(stderr, "error while reading file: %s\n", strerror(errno));
+        error("error while reading file: %s\n", strerror(errno));
         return NULL;
     }
 
@@ -272,15 +272,15 @@ static int whisper_pattern_match(const char *pattern, const char *str) {
     pcre * re = NULL;
     int erroffset = -1;
     int rc = -1; // result of pcre_exec()
-    const char *error;
+    const char *errmsg;
     const int OVECCOUNT = 30; // according to pcresample, should be a multiple of 3
     int ovector[OVECCOUNT];
 
-    re = pcre_compile(pattern, 0, &error, &erroffset, NULL);
+    re = pcre_compile(pattern, 0, &errmsg, &erroffset, NULL);
 
     /* Compilation failed: print the error message and exit */
     if (re == NULL) {
-        fprintf(stderr, "whisper: PCRE compilation failed at offset %d: %s\n", erroffset, error);
+        error("whisper: PCRE compilation failed at offset %d: %s\n", erroffset, errmsg);
         return 2;
     }
 
@@ -293,7 +293,7 @@ static int whisper_pattern_match(const char *pattern, const char *str) {
     }
 
     else if (rc != PCRE_ERROR_NOMATCH) {
-       fprintf(stderr, "whisper: matching error %d\n", rc);
+       error("whisper: matching error %d\n", rc);
        pcre_free(re);
        return 2;
     }
@@ -373,12 +373,12 @@ static void create_dir(char * dir_name) {
             debug("create database directory: %s", dir_name);
             mkdir(dir_name, S_IRWXU | S_IRWXG); /* 770 */
         } else {
-            fprintf(stderr, "error during stat: %s\n", strerror(errno));
+            error("error during stat: %s\n", strerror(errno));
             exit(1);
         }
     } else {
         if(!S_ISDIR(s.st_mode)) { /* exists but not a directory */
-            fprintf(stderr, "%s exists but is not a directory!\n", dir_name);
+            error("%s exists but is not a directory!\n", dir_name);
             exit(1);
         }
     }
@@ -399,7 +399,7 @@ static char * whisper_metric_filename(const metric_t *metric) {
     strncpy(tmp_dir_name, conf->storage_dir, strlen(conf->storage_dir)+1);
     /* TODO: handle relative path with:
     if (realpath(".", tmp_dir_name) == NULL) {
-        fprintf(stderr, "error during realpath(): %s\n", strerror(errno));
+        error("error during realpath(): %s\n", strerror(errno));
     }
     */
 
@@ -437,7 +437,7 @@ static void whisper_create_dirs(const metric_t *metric) {
     strncpy(tmp_dir_name, conf->storage_dir, strlen(conf->storage_dir)+1);
     /* TODO: handle relative path with:
     if (realpath(".", tmp_dir_name) == NULL) {
-        fprintf(stderr, "error during realpath(): %s\n", strerror(errno));
+        error("error during realpath(): %s\n", strerror(errno));
     }
     */
 
@@ -548,7 +548,7 @@ static int whisper_create_file(const metric_t *metric) {
     whisper_fd = open(filename, O_RDWR|O_CREAT, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH);
 
     if(whisper_fd == -1) {
-        fprintf(stderr, "failed to open file: %s\n", strerror(errno));
+        error("failed to open file: %s\n", strerror(errno));
         return -1;
     }
 
@@ -556,7 +556,7 @@ static int whisper_create_file(const metric_t *metric) {
 
     debug("writing whisper headers in file");
     if (write(whisper_fd, &new_wsp_md, WHISPER_HEADER_SIZE) < WHISPER_HEADER_SIZE) {
-        fprintf(stderr, "error while writing file: %s\n", strerror(errno));
+        error("error while writing file: %s\n", strerror(errno));
         return -1;
     }
 
@@ -572,7 +572,7 @@ static int whisper_create_file(const metric_t *metric) {
         hton_archive_info(&wsp_cur_arch);
         debug("writing archive %d header in file", id_ret);
         if (write(whisper_fd, &wsp_cur_arch, WHISPER_ARCHIVE_SIZE) < WHISPER_ARCHIVE_SIZE) {
-            fprintf(stderr, "error while writing file: %s\n", strerror(errno));
+            error("error while writing file: %s\n", strerror(errno));
             return -1;
         }
 
@@ -593,7 +593,7 @@ static int whisper_create_file(const metric_t *metric) {
                nb_points, sizeof_arch);
 
         if (write(whisper_fd, empty_arch, sizeof_arch) < sizeof_arch) {
-            fprintf(stderr, "error while writing file: %s\n", strerror(errno));
+            error("error while writing file: %s\n", strerror(errno));
             return -1;
         }
 
@@ -666,13 +666,13 @@ int whisper_write_point(int whisper_fd, archive_info_t *archive, uint32_t timest
 
     // goto write offset
     if (lseek(whisper_fd, write_offset , SEEK_SET) < 0) {
-        fprintf(stderr, "error while seeking file: %s\n", strerror(errno));
+        error("error while seeking file: %s\n", strerror(errno));
         return 1;
     }
 
     // write point    
     if (write(whisper_fd, &point, WHISPER_POINT_SIZE) < WHISPER_POINT_SIZE) {
-        fprintf(stderr, "error while writing file: %s\n", strerror(errno));
+        error("error while writing file: %s\n", strerror(errno));
         return 1;
     }
 
@@ -745,12 +745,12 @@ static int whisper_write_propagate(int whisper_fd, uint32_t timestamp,
               wsp_arch_higher->offset,
               higher_end_offset);
         if (read(whisper_fd, rd_buf, rd_len) != rd_len) {
-            fprintf(stderr, "error while reading file: %s\n", strerror(errno));
+            error("error while reading file: %s\n", strerror(errno));
         }
         whisper_seek(whisper_fd, wsp_arch_higher->offset);
         rd_len2 = wsp_arch_higher->offset - higher_end_offset;
         if (read(whisper_fd, rd_buf+rd_len, rd_len2) != rd_len2) {
-            fprintf(stderr, "error while reading file: %s\n", strerror(errno));
+            error("error while reading file: %s\n", strerror(errno));
         }
         rd_len += rd_len2;
     }
@@ -826,7 +826,7 @@ int whisper_write_value(const metric_t * metric,
                 whisper_fd = whisper_create_file(metric);
                 break;
             default:
-                fprintf(stderr, "error while opening file: %s\n", strerror(errno));
+                error("error while opening file: %s\n", strerror(errno));
                 return EXIT_FAILURE;
         }
     }
@@ -930,7 +930,7 @@ void whisper_print_file(const char * filename) {
 
         sk_res = lseek(whisper_fd, loop_offset , SEEK_SET);
         if (sk_res < 0) {
-            fprintf(stderr, "error while seeking file: %s\n", strerror(errno));
+            error("error while seeking file: %s\n", strerror(errno));
         }
 
         for(point_id=0; point_id<arch_info->points; point_id++) {

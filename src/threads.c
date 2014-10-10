@@ -41,7 +41,7 @@ void block_signals() {
     sigaddset(&set, SIGINT);
 
     if (pthread_sigmask(SIG_BLOCK, &set, NULL) != 0) {
-        fprintf(stderr, "error on pthread_sigmask(): %s", strerror(errno));
+        error("error on pthread_sigmask(): %s", strerror(errno));
     }
 
 }

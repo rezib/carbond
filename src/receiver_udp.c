@@ -63,7 +63,7 @@ void * receiver_udp_worker(void * arg) {
                 case EAGAIN: /* timeout reached and nothing received */
                     break;
                 default:     /* else unmanaged error that deserves to be printed */
-                    fprintf(stderr, "error occured on recvfrom: %s\n", strerror(errno));
+                    error("error occured on recvfrom: %s\n", strerror(errno));
             }
         } else {
             debug("received %d bytes", n);
@@ -91,7 +91,7 @@ static int receiver_udp_init_socket() {
      */
     sockfd = socket(AF_INET, SOCK_DGRAM, 0);
     if (sockfd < 0) { 
-        fprintf(stderr, "error on opening socket: %s", strerror(errno));
+        error("error on opening socket: %s", strerror(errno));
         return -1;
     }
 
@@ -102,7 +102,7 @@ static int receiver_udp_init_socket() {
      */
     optval = 1;
     if(setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, (const void *)&optval , sizeof(int)) < 0) {
-        fprintf(stderr, "error on setsockopt() SO_REUSEADDR: %s", strerror(errno));
+        error("error on setsockopt() SO_REUSEADDR: %s", strerror(errno));
         return -1;
     }
 
@@ -111,7 +111,7 @@ static int receiver_udp_init_socket() {
     tv.tv_usec = 500000;
 
     if(setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, (struct timeval *)&tv, sizeof(struct timeval)) < 0) {
-        fprintf(stderr, "error on setsockopt() SO_RCVTIMEO: %s", strerror(errno));
+        error("error on setsockopt() SO_RCVTIMEO: %s", strerror(errno));
         return -1;
     }
 
@@ -169,7 +169,7 @@ carbon_thread_t launch_receiver_udp_thread() {
     thread.name = "UDP receiver";
 
     if (pthread_create(&thread.pthread, NULL, receiver_udp_worker, (void*)args) != 0) {
-        fprintf(stderr, "error on pthread_create: %s\n", strerror(errno));
+        error("error on pthread_create: %s\n", strerror(errno));
     }
 
     return thread;

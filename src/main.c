@@ -183,19 +183,19 @@ int main(int argc, char *argv[]) {
     /* parse config files */
     status = conf_parse_carbon_file();
     if (status) {
-        fprintf(stderr, "error while parsing carbon configuration file\n");
+        error("error while parsing carbon configuration file\n");
         return EXIT_FAILURE;
     }
 
     status = conf_parse_storage_schema_file();
     if (status) {
-        fprintf(stderr, "error while parsing storage schema file\n");
+        error("error while parsing storage schema file\n");
         return EXIT_FAILURE;
     }
 
     status = conf_parse_storage_aggregation_file();
     if (status) {
-        fprintf(stderr, "error while parsing storage aggregation file\n");
+        error("error while parsing storage aggregation file\n");
         return EXIT_FAILURE;
     }
 
