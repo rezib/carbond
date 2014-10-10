@@ -57,21 +57,47 @@ static void log_msg(const log_level_t level, const char *fmt, va_list args) {
         }
 
         vsnprintf(buf, LOG_BUF_MAXSIZE, fmt, args);
-        printf("%s: %s\n", pfx, buf);
+
+        // print error on stderr
+        if (level == LOG_LEVEL_ERROR)
+            fprintf(stderr, "%s: %s\n", pfx, buf);
+        else
+            fprintf(stdout, "%s: %s\n", pfx, buf);
         free(buf);
     }
 }
 
+void error(const char *fmt, ...) {
+    va_list ap;
+    va_start(ap, fmt);
+    log_msg(LOG_LEVEL_ERROR, fmt, ap);
+    va_end(ap);
+}
+
+void warning(const char *fmt, ...) {
+    va_list ap;
+    va_start(ap, fmt);
+    log_msg(LOG_LEVEL_WARNING, fmt, ap);
+    va_end(ap);
+}
+
 void info(const char *fmt, ...) {
-  va_list ap;
-  va_start(ap, fmt);
-  log_msg(LOG_LEVEL_INFO, fmt, ap);
-  va_end(ap);
+    va_list ap;
+    va_start(ap, fmt);
+    log_msg(LOG_LEVEL_INFO, fmt, ap);
+    va_end(ap);
+}
+
+void verbose(const char *fmt, ...) {
+    va_list ap;
+    va_start(ap, fmt);
+    log_msg(LOG_LEVEL_VERBOSE, fmt, ap);
+    va_end(ap);
 }
 
 void _debug(const char *fmt, ...) {
-  va_list ap;
-  va_start(ap, fmt);
-  log_msg(LOG_LEVEL_DEBUG, fmt, ap);
-  va_end(ap);
+    va_list ap;
+    va_start(ap, fmt);
+    log_msg(LOG_LEVEL_DEBUG, fmt, ap);
+    va_end(ap);
 }

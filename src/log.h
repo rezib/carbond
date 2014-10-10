@@ -41,7 +41,10 @@ typedef enum {
   LOG_LEVEL_END
 } log_level_t;
 
+void error(const char *, ...);
+void warning(const char *, ...);
 void info(const char *, ...);
+void verbose(const char *, ...);
 void _debug(const char *, ...);
 
 #endif
