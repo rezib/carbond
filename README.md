@@ -52,12 +52,15 @@ Roadmap
 ### `0.2`
 
 * _ code architecture documentation (with schemas)
-* _ better log/output utilities
+* X better log/output utilities
 * _ cache query thread
 * _ multiple write at once function for whisper
 * _ implement cache priority queue with heap
 * _ implement exclusive mode to cache files offset
 * _ make Python linked query thread optional at configure time
+* _ implement foreground/daemon (with logging to syslog)
+* _ handle SIGUP to reload configuration on the fly
+* _ internal counters threads with its own metrics
 
 ### `0.3`
 
