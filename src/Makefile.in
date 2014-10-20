@@ -176,7 +176,20 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AM_CFLAGS = -Wall -DSYSCONFDIR="\"${sysconfdir}\""
 AM_LDFLAGS = -lpthread -lpcre -lrt
-carbond_SOURCES = main.c common.h log.c log.h conf.c conf.h protocol.c procotol.h receiver_tcp.c receiver_tcp.h receiver_udp.c receiver_udp.h monitoring.c monitoring.h database.c database.h threads.c threads.h whisper.c whisper.h writer.c writer.h
+carbond_SOURCES = \
+  main.c \
+  common.h \
+  log.c log.h \
+  conf.c conf.h \
+  protocol.c procotol.h \
+  receiver_tcp.c receiver_tcp.h \
+  receiver_udp.c receiver_udp.h \
+  monitoring.c monitoring.h \
+  database.c database.h \
+  threads.c threads.h \
+  whisper.c whisper.h \
+  writer.c writer.h
+
 all: all-am
 
 .SUFFIXES:
