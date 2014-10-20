@@ -64,8 +64,8 @@ am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
 am_carbond_OBJECTS = main.$(OBJEXT) log.$(OBJEXT) conf.$(OBJEXT) \
 	protocol.$(OBJEXT) receiver_tcp.$(OBJEXT) \
-	receiver_udp.$(OBJEXT) database.$(OBJEXT) threads.$(OBJEXT) \
-	whisper.$(OBJEXT) writer.$(OBJEXT)
+	receiver_udp.$(OBJEXT) monitoring.$(OBJEXT) database.$(OBJEXT) \
+	threads.$(OBJEXT) whisper.$(OBJEXT) writer.$(OBJEXT)
 carbond_OBJECTS = $(am_carbond_OBJECTS)
 carbond_LDADD = $(LDADD)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
@@ -175,8 +175,8 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AM_CFLAGS = -Wall -DSYSCONFDIR="\"${sysconfdir}\""
-AM_LDFLAGS = -lpthread -lpcre
-carbond_SOURCES = main.c common.h log.c log.h conf.c conf.h protocol.c procotol.h receiver_tcp.c receiver_tcp.h receiver_udp.c receiver_udp.h database.c database.h threads.c threads.h whisper.c whisper.h writer.c writer.h
+AM_LDFLAGS = -lpthread -lpcre -lrt
+carbond_SOURCES = main.c common.h log.c log.h conf.c conf.h protocol.c procotol.h receiver_tcp.c receiver_tcp.h receiver_udp.c receiver_udp.h monitoring.c monitoring.h database.c database.h threads.c threads.h whisper.c whisper.h writer.c writer.h
 all: all-am
 
 .SUFFIXES:
@@ -265,6 +265,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/database.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/log.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/monitoring.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/protocol.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/receiver_tcp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/receiver_udp.Po@am__quote@

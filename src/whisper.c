@@ -34,7 +34,7 @@
 #include <sys/stat.h>  // stat()
 #include <assert.h>
 #include <pcre.h>
-
+#include <pthread.h>   // pthread_mutex_[un]lock()
 #include "common.h"
 #include "whisper.h"
 
@@ -675,6 +675,11 @@ int whisper_write_point(int whisper_fd, archive_info_t *archive, uint32_t timest
         error("error while writing file: %s\n", strerror(errno));
         return 1;
     }
+
+    // update internal monitoring data
+    pthread_mutex_lock(&(monitoring->mutex_points));
+    monitoring->points++;
+    pthread_mutex_unlock(&(monitoring->mutex_points));
 
     return 0;
 

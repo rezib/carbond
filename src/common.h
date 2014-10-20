@@ -125,9 +125,18 @@ struct carbon_conf_s {
 
 typedef struct carbon_conf_s carbon_conf_t;
 
+struct monitoring_metrics_s {
+    uint32_t points;
+    pthread_mutex_t mutex_points;
+};
+
+typedef struct monitoring_metrics_s monitoring_metrics_t;
+
 /*
  *  global conf variable
  */
 extern carbon_conf_t *conf;
+
+extern monitoring_metrics_t *monitoring;
 
 #endif

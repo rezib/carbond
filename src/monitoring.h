@@ -19,18 +19,18 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
  */
 
-#ifndef CARBON_DATABASE_H
-#define CARBON_DATABASE_H
+#ifndef CARBOND_MONITORING_H
+#define CARBOND_MONITORING_H
 
-#include <stdint.h>
-#include "common.h"
+#include "threads.h"  // carbon_thread_t type
 
+struct monitoring_args_s {
+    int id_thread;
+};
 
-metric_t * get_metric(metrics_database_t *, const char *);
-void add_database_metric_point(metrics_database_t *, metric_t *, metric_point_t *);
-void add_database_metric(metrics_database_t *, metric_t *);
-metric_point_t * create_new_metric_point(const uint32_t, const double);
-metric_t * create_new_metric(const char *);
-void create_database(void);
+typedef struct monitoring_args_s monitoring_args_t;
+
+void * monitoring_worker(void *);
+carbon_thread_t launch_monitoring_thread();
 
 #endif

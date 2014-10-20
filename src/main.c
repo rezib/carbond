@@ -25,16 +25,21 @@
 
 #include "common.h"
 #include "conf.h"
+#include "database.h"
 #include "threads.h"
 #include "receiver_udp.h"
 #include "receiver_tcp.h"
-#include "database.h"
 #include "writer.h"
+#include "monitoring.h"
 
 /*
  * Initialize global runtime configuration variable
  */
 carbon_conf_t *conf = NULL;
+/*
+ * Initialize global monitoring db variable
+ */
+monitoring_metrics_t *monitoring = NULL;
 
 void print_usage() {
 
@@ -164,7 +169,8 @@ int main(int argc, char *argv[]) {
 
     carbon_thread_t receiver_udp_thread,
                     receiver_tcp_thread,
-                    writer_thread;
+                    writer_thread,
+                    monitoring_thread;
 
     struct sigaction sa;
     int status = 0;
@@ -174,6 +180,7 @@ int main(int argc, char *argv[]) {
      */
 
     conf = calloc(1, sizeof(carbon_conf_t));
+    monitoring = calloc(1, sizeof(monitoring_metrics_t));
 
     /* load default runtime configuration */
     default_conf();
@@ -217,6 +224,7 @@ int main(int argc, char *argv[]) {
      */
 
     /* launch main threads */
+    monitoring_thread = launch_monitoring_thread();
     receiver_udp_thread = launch_receiver_udp_thread();
     receiver_tcp_thread = launch_receiver_tcp_thread();
     writer_thread = launch_writer_thread();
@@ -225,6 +233,7 @@ int main(int argc, char *argv[]) {
     wait_thread(receiver_udp_thread);
     wait_thread(receiver_tcp_thread);
     wait_thread(writer_thread);
+    wait_thread(monitoring_thread);
 
     debug("all threads terminated properly");
 

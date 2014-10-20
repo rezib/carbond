@@ -31,7 +31,7 @@
  * to the the metric. Else returns NULL.
  */
 
-metric_t * get_metric(metrics_database_t * db, char * m_name) {
+metric_t * get_metric(metrics_database_t * db, const char * m_name) {
 
     metric_t *cur_m = db->first;
 
@@ -68,7 +68,7 @@ void add_database_metric(metrics_database_t *db, metric_t *new_metric) {
     db->last = new_metric;
 }
 
-metric_point_t * create_new_metric_point(uint32_t timestamp, double value) {
+metric_point_t * create_new_metric_point(const uint32_t timestamp, const double value) {
 
     metric_point_t *res = calloc(1, sizeof(metric_point_t));
     res->timestamp = timestamp;
@@ -78,7 +78,7 @@ metric_point_t * create_new_metric_point(uint32_t timestamp, double value) {
 
 }
 
-metric_t * create_new_metric(char * name) {
+metric_t * create_new_metric(const char *name) {
     
     metric_t *res = calloc(1, sizeof(metric_t));
     res->name = malloc(sizeof(char)*strlen(name)+1);
