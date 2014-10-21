@@ -60,9 +60,16 @@ void * receiver_udp_worker(void * arg) {
         n = recvfrom(sockfd, mesg, MAX_UDP_READ, 0, (struct sockaddr *)&cliaddr, &len);
         if (n == -1) {
             switch(errno) {
-                case EAGAIN: /* timeout reached and nothing received */
+                case EINTR:
+                    /* interrupted system call: it notably happens with
+                     * debuggers such as gdb. Simply ignore and try again.
+                     */
                     break;
-                default:     /* else unmanaged error that deserves to be printed */
+                case EAGAIN:
+                    /* timeout reached and nothing received */
+                    break;
+                default:
+                    /* else unmanaged error that deserves to be printed */
                     error("error occured on recvfrom: %s\n", strerror(errno));
             }
         } else {

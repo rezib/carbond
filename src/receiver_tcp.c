@@ -58,9 +58,16 @@ void * receiver_tcp_worker(void * arg) {
         conn = accept(sockfd, NULL, NULL);
         if ( conn < 0 ) {
             switch(errno) {
-                case EAGAIN: /* timeout reached and nothing received */
+                case EINTR:
+                    /* interrupted system call: it notably happens with
+                     * debuggers such as gdb. Simply ignore and try again.
+                     */
                     break;
-                default:     /* else unmanaged error that deserves to be printed */
+                case EAGAIN:
+                    /* timeout reached and nothing received */
+                    break;
+                default:
+                    /* else unmanaged error that deserves to be printed */
                     error("error calling accept(): %s\n", strerror(errno));
             }
        } else {
@@ -69,9 +76,18 @@ void * receiver_tcp_worker(void * arg) {
                 then simply write it back to the same socket.     */
             n = recvfrom(conn, mesg, MAX_TCP_READ, 0,(struct sockaddr *)&cliaddr, &clilen);
             
-            if (n == -1)
-                error("error occured on recvfrom: %s\n", strerror(errno));
-            else {
+            if (n == -1) {
+                switch(errno) {
+                    case EINTR:
+                        /* interrupted system call: it notably happens with
+                         * debuggers such as gdb. Simply ignore and try again.
+                         */
+                        break;
+                    default:
+                        /* else unmanaged error that deserves to be printed */
+                        error("error occured on recvfrom(): %s\n", strerror(errno));
+                }
+            } else {
                 debug("received %d bytes", n);
                 mesg[n] = '\0';
                 protocol_process_metrics_multiline(mesg);
