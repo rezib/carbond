@@ -176,7 +176,7 @@ static inline uint32_t archive_offset_end(archive_info_t *arch_info) {
 
 static inline int whisper_seek(int whisper_fd, int offset) {
 
-    if (lseek(whisper_fd, offset , SEEK_SET) < 0) {
+    if (lseek(whisper_fd, offset, SEEK_SET) < 0) {
         error("error while seeking file: %s\n", strerror(errno));
         return EXIT_FAILURE;
     }
@@ -863,8 +863,10 @@ int whisper_write_value(const metric_t * metric,
     wsp_arch_higher = wsp_arch;
     end_loop = false;
 
-    for(archive_id=0; !end_loop && archive_id < wsp_md->archive_count; archive_id++) {
-        wsp_arch_lower = whisper_read_archive_info(whisper_fd, archive_id+1);
+    for(archive_id=1; !end_loop && archive_id < wsp_md->archive_count; archive_id++) {
+        wsp_arch_lower = whisper_read_archive_info(whisper_fd, archive_id);
+
+        assert(wsp_arch_lower->seconds_per_point != 0);
 
         // only if timestamp can be divided by lower archive seconds per point
         if (aligned_timestamp % wsp_arch_lower->seconds_per_point == 0) {
