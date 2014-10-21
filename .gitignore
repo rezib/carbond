@@ -2,6 +2,7 @@ config.h
 config.log
 config.status
 stamp-h1
+autom4te.cache
 etc/carbon.conf
 src/.deps
 src/carbond
