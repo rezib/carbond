@@ -1,5 +1,7 @@
 AM_CFLAGS = -Wall -DSYSCONFDIR="\"${sysconfdir}\""
-AM_LDFLAGS = -lpthread -lpcre -lrt
+AM_LDFLAGS =
+
+carbond_LDADD = @PCRE_LIBS@
 
 bin_PROGRAMS = carbond
 carbond_SOURCES = \

@@ -67,7 +67,7 @@ am_carbond_OBJECTS = main.$(OBJEXT) log.$(OBJEXT) conf.$(OBJEXT) \
 	receiver_udp.$(OBJEXT) monitoring.$(OBJEXT) database.$(OBJEXT) \
 	threads.$(OBJEXT) whisper.$(OBJEXT) writer.$(OBJEXT)
 carbond_OBJECTS = $(am_carbond_OBJECTS)
-carbond_LDADD = $(LDADD)
+carbond_DEPENDENCIES =
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -175,7 +175,8 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AM_CFLAGS = -Wall -DSYSCONFDIR="\"${sysconfdir}\""
-AM_LDFLAGS = -lpthread -lpcre -lrt
+AM_LDFLAGS = 
+carbond_LDADD = @PCRE_LIBS@
 carbond_SOURCES = \
   main.c \
   common.h \
