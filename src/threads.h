@@ -22,8 +22,13 @@
 #ifndef CARBON_THREADS_H
 #define CARBON_THREADS_H
 
+#include <stdbool.h>
+
 struct carbon_thread_s {
     pthread_t pthread;
+    pthread_mutex_t run_lock;
+    pthread_cond_t can_run;
+    bool must_pause;
     char *name;
 };
 
@@ -44,6 +49,11 @@ extern carbon_threads_t *threads;
 
 void block_signals();
 void thread_init(carbon_thread_t *, char *);
+void thread_run_lock(carbon_thread_t *);
+bool thread_must_pause(carbon_thread_t *);
+void thread_pause_and_wait_run_signal(carbon_thread_t *);
 void threads_wait_all_stopped();
+void threads_pause_all();
+void threads_resume_all();
 
 #endif

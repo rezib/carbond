@@ -54,7 +54,14 @@ void * receiver_tcp_worker(void * arg) {
      */
     block_signals();
 
+    thread_run_lock(me);
+
     while(conf->run) {
+
+        if(thread_must_pause(me)) {
+            thread_pause_and_wait_run_signal(me);
+        }
+
         /*  Wait for a connection, then accept() it  */
         conn = accept(sockfd, NULL, NULL);
         if ( conn < 0 ) {

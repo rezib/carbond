@@ -88,7 +88,14 @@ void * writer_thread(void * thread_args) {
 
     debug("thread %u is running", w_thd_args->id_thread);
 
+    thread_run_lock(me);
+
     for(;conf->run;) {
+
+        if(thread_must_pause(me)) {
+            thread_pause_and_wait_run_signal(me);
+        }
+
         max_m = find_largest_metric();
 
         if (max_m) {

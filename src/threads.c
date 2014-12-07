@@ -52,6 +52,66 @@ void block_signals() {
 void thread_init(carbon_thread_t *thread, char *name) {
 
     thread->name = name;
+    thread->must_pause = false;
+
+    if (pthread_mutex_init(&(thread->run_lock), NULL) != 0) {
+        error("thread %s run_lock mutex init failed", thread->name);
+    }
+
+    if (pthread_cond_init (&(thread->can_run), NULL) != 0) {
+        error("thread %s can_run cond init failed", thread->name);
+    }
+
+}
+
+/*
+ * only called by threads_pause_all()
+ */
+static void thread_order_pause(carbon_thread_t *thread) {
+
+    debug("ordered pause for thread %s", thread->name);
+    thread->must_pause = true;
+
+}
+
+void thread_run_lock(carbon_thread_t *thread) {
+
+    pthread_mutex_lock(&(thread->run_lock));
+
+}
+
+/*
+ * only called by threads_pause_all()
+ */
+static void thread_wait_paused(carbon_thread_t *thread) {
+
+    thread_run_lock(thread);
+
+}
+
+/*
+ * only called by threads_resume_all()
+ */
+static void thread_resume(carbon_thread_t *thread) {
+
+    debug("resuming thread %s", thread->name);
+    thread->must_pause = false;
+    pthread_cond_signal(&(thread->can_run));
+    pthread_mutex_unlock(&(thread->run_lock));
+
+}
+
+bool thread_must_pause(carbon_thread_t *thread) {
+
+    return thread->must_pause;
+
+}
+
+void thread_pause_and_wait_run_signal(carbon_thread_t *thread) {
+
+    debug("thread %s waiting for run cond", thread->name);
+    pthread_cond_wait(&(thread->can_run),&(thread->run_lock));
+    debug("thread %s pause end", thread->name);
 
 }
 
@@ -75,5 +135,37 @@ void threads_wait_all_stopped() {
     thread_wait_stopped(threads->writer_thread);
     thread_wait_stopped(threads->monitoring_thread);
     debug("all threads are stopped");
+
+}
+
+/*
+ * Order all threads to pause and wait for them to be paused. Returns once all
+ * threads are paused.
+ */
+void threads_pause_all() {
+
+    debug("pausing all threads");
+    thread_order_pause(threads->receiver_udp_thread);
+    thread_order_pause(threads->receiver_tcp_thread);
+    thread_order_pause(threads->writer_thread);
+    thread_order_pause(threads->monitoring_thread);
+
+    thread_wait_paused(threads->receiver_udp_thread);
+    thread_wait_paused(threads->receiver_tcp_thread);
+    thread_wait_paused(threads->writer_thread);
+    thread_wait_paused(threads->monitoring_thread);
+
+}
+
+/*
+ * Unpause all threads.
+ */
+void threads_resume_all() {
+
+    debug("resuming all threads");
+    thread_resume(threads->receiver_udp_thread);
+    thread_resume(threads->receiver_tcp_thread);
+    thread_resume(threads->writer_thread);
+    thread_resume(threads->monitoring_thread);
 
 }

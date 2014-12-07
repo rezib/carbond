@@ -87,12 +87,18 @@ void * monitoring_worker(void * arg) {
      */
     block_signals();
 
+    thread_run_lock(me);
+
     // init all mutexes
     if (pthread_mutex_init(&(monitoring->mutex_points), NULL) != 0) {
         error("monitoring mutex_points init failed");
     }
 
     for (;conf->run;) {
+
+        if(thread_must_pause(me)) {
+            thread_pause_and_wait_run_signal(me);
+        }
 
         update_monitoring_metrics();
 

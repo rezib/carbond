@@ -56,7 +56,14 @@ void * receiver_udp_worker(void * arg) {
      */
     block_signals();
 
+    thread_run_lock(me);
+
     for (;conf->run;) {
+
+        if(thread_must_pause(me)) {
+            thread_pause_and_wait_run_signal(me);
+        }
+
         len = sizeof(cliaddr);
         n = recvfrom(sockfd, mesg, MAX_UDP_READ, 0, (struct sockaddr *)&cliaddr, &len);
         if (n == -1) {
