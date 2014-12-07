@@ -95,6 +95,93 @@ void default_conf() {
 }
 
 /*
+ * Copy conf structs members except from orig_conf to dest_conf, except:
+ *  - schema
+ *  - aggregation
+ * Since this function is only used by conf_reload() and the schema and
+ * aggregation members are populated by conf_parse_storage_schema_file()
+ * and conf_parse_storage_aggregation_file() before the new runtime
+ * configuration is used by threads.
+ */
+void conf_copy(carbon_conf_t *orig_conf, carbon_conf_t *dest_conf) {
+
+    memcpy(dest_conf, orig_conf, sizeof(carbon_conf_t));
+    dest_conf->schema = NULL;
+    dest_conf->aggregation = NULL;
+
+    /* copy strings properly */
+    dest_conf->conf_dir = malloc(sizeof(char)*PATH_MAX);
+    memset(dest_conf->conf_dir, 0, sizeof(char)*PATH_MAX);
+    strncpy(dest_conf->conf_dir, orig_conf->conf_dir, strlen(orig_conf->conf_dir));
+
+    dest_conf->conf_file = malloc(sizeof(char)*PATH_MAX);
+    memset(dest_conf->conf_file, 0, sizeof(char)*PATH_MAX);
+    strncpy(dest_conf->conf_file, orig_conf->conf_file, strlen(orig_conf->conf_file));
+
+    dest_conf->storage_dir = malloc(sizeof(char)*PATH_MAX);
+    memset(dest_conf->storage_dir, 0, sizeof(char)*PATH_MAX);
+    strncpy(dest_conf->storage_dir, orig_conf->storage_dir, strlen(orig_conf->storage_dir));
+
+}
+
+/*
+ * Free memory allocated for runtime conf, except:
+ * - db
+ * Since this function is only used by conf_reload() and the db should not
+ * be freed because it would result in an empty db and lost metrics data points
+ * once threads restart.
+ */
+void conf_free(carbon_conf_t *c) {
+
+    pattern_retention_t *pret = NULL,
+                        *n_pret = NULL;
+    retention_t *ret = NULL,
+                *n_ret = NULL;
+    pattern_aggregation_t *agg = NULL,
+                          *n_agg = NULL;
+
+    free(c->conf_dir);
+    free(c->conf_file);
+    free(c->storage_dir);
+
+    pret = c->schema;
+
+    while(pret) {
+        n_pret = pret->next;
+        free(pret->str_pattern);
+        pret->str_pattern = NULL;
+        free(pret->str_retention);
+        pret->str_retention = NULL;
+        ret = pret->retention_list;
+        while(ret) {
+            n_ret = ret->next;
+            free(ret);
+            ret = NULL;
+            ret = n_ret;
+        }
+        pret->retention_list = NULL;
+        free(pret);
+        pret = NULL;
+        pret = n_pret;
+    }
+    c->schema = NULL;
+
+    agg = c->aggregation;
+
+    while(agg) {
+        n_agg = agg->next;
+        free(agg->pattern);
+        free(agg);
+        agg = NULL;
+        agg = n_agg;
+    }
+    c->aggregation = NULL;
+
+    free(c);
+
+}
+
+/*
  * Prints the runtime configuration parameters to stdout
  */
 void print_conf() {
@@ -159,6 +246,51 @@ void parse_args(int argc, char * argv[]) {
 }
 
 /*
+ * Reload configuration files, then update runtime configuration accordingly.
+ *
+ * The logic is:
+ *  1/ copy current runtime configuration
+ *  2/ parse files to overload current runtime configuration
+ *  3/ if parsing is OK:
+ *    3.1/ pause threads
+ *    3.2/ replace current runtime configuration by the new one
+ *    3.3/ resume threads
+ *
+ * Why copying current runtime configuration instead of calling conf_default?
+ * Because the default conf could have been overloaded by parameters, and we
+ * do not want to parse parameters again at this point.
+ */
+void conf_reload() {
+
+    carbon_conf_t *new_conf;
+    int parse_status = 0;
+    new_conf = calloc(1, sizeof(carbon_conf_t));
+    conf_copy(conf, new_conf);
+    parse_status = conf_parse(new_conf);
+
+    if (parse_status)
+        error("parsing new configuration failed");
+    else {
+        threads_pause_all();
+        conf_free(conf);
+        conf = new_conf;
+        print_conf();
+        threads_resume_all();
+    }
+
+}
+
+/*
+ * SIGHUP signal handler.
+ * Reload configuration.
+ */
+void sighup_handler(int signb) {
+
+    debug("received SIGHUP, reloading configuration");
+    conf_reload();
+}
+
+/*
  * SIGINT signal handler.
  * Basically set conf->run boolean to false in order to stop threads loops.
  */
@@ -171,7 +303,7 @@ void sigint_handler(int signb) {
 
 int main(int argc, char *argv[]) {
 
-    struct sigaction sa;
+    struct sigaction sa_int, sa_hup;
     int status = 0;
 
     /*
@@ -203,8 +335,11 @@ int main(int argc, char *argv[]) {
     /*
      *  signals handling
      */
-    sa.sa_handler = &sigint_handler;
-    sigaction(SIGINT, &sa, NULL);
+
+    sa_int.sa_handler = &sigint_handler;
+    sigaction(SIGINT, &sa_int, NULL);
+    sa_hup.sa_handler = &sighup_handler;
+    sigaction(SIGHUP, &sa_hup, NULL);
 
     /*
      * threads
