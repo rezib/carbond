@@ -155,10 +155,11 @@ static int receiver_udp_bind_socket(int sockfd) {
 
 }
 
-carbon_thread_t launch_receiver_udp_thread() {
+carbon_thread_t * launch_receiver_udp_thread() {
 
     int sockfd;
-    carbon_thread_t thread;
+    carbon_thread_t * thread;
+    thread = calloc(1, sizeof(carbon_thread_t));
     receiver_udp_args_t *args = calloc(1, sizeof(receiver_udp_args_t));
 
     debug("creating the UDP socket");
@@ -173,9 +174,9 @@ carbon_thread_t launch_receiver_udp_thread() {
     args->id_thread = 0;
     args->sockfd = sockfd;
 
-    thread.name = "UDP receiver";
+    thread->name = "UDP receiver";
 
-    if (pthread_create(&thread.pthread, NULL, receiver_udp_worker, (void*)args) != 0) {
+    if (pthread_create(&(thread->pthread), NULL, receiver_udp_worker, (void*)args) != 0) {
         error("error on pthread_create: %s\n", strerror(errno));
     }
 

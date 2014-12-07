@@ -79,7 +79,6 @@ void * writer_thread(void * thread_args) {
 
     struct writer_thread_args * w_thd_args = (struct writer_thread_args *) thread_args;
     metric_t *max_m = NULL;
-
     /*
      * Blocks signals (SIGINT, SIGTERM, etc) in this thread so that they are all
      * handled in main thread.
@@ -104,17 +103,18 @@ void * writer_thread(void * thread_args) {
     return NULL;
 }
 
-carbon_thread_t launch_writer_thread() {
+carbon_thread_t *launch_writer_thread() {
 
-    carbon_thread_t thread;
+    carbon_thread_t *thread;
     struct writer_thread_args * w_thd_args = NULL;
 
-    thread.name = "Writer";
+    thread = calloc(1, sizeof(carbon_thread_t));
+    thread->name = "Writer";
 
     w_thd_args = (struct writer_thread_args *) malloc(sizeof(struct writer_thread_args));
     w_thd_args->id_thread = 0;
 
-    if (pthread_create(&thread.pthread, NULL, writer_thread, (void*)w_thd_args) != 0) {
+    if (pthread_create(&(thread->pthread), NULL, writer_thread, (void*)w_thd_args) != 0) {
         error("error on pthread_create: %s\n", strerror(errno));
         exit(1);
     }

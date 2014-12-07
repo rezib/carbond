@@ -167,10 +167,10 @@ void sigint_handler() {
 
 int main(int argc, char *argv[]) {
 
-    carbon_thread_t receiver_udp_thread,
-                    receiver_tcp_thread,
-                    writer_thread,
-                    monitoring_thread;
+    carbon_thread_t *receiver_udp_thread,
+                    *receiver_tcp_thread,
+                    *writer_thread,
+                    *monitoring_thread;
 
     struct sigaction sa;
     int status = 0;
@@ -217,10 +217,10 @@ int main(int argc, char *argv[]) {
     writer_thread = launch_writer_thread();
 
     /* wait until end */
-    wait_thread(receiver_udp_thread);
-    wait_thread(receiver_tcp_thread);
-    wait_thread(writer_thread);
-    wait_thread(monitoring_thread);
+    wait_thread(*receiver_udp_thread);
+    wait_thread(*receiver_tcp_thread);
+    wait_thread(*writer_thread);
+    wait_thread(*monitoring_thread);
 
     debug("all threads terminated properly");
 

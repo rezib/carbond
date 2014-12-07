@@ -32,6 +32,6 @@ struct receiver_udp_args_s {
 typedef struct receiver_udp_args_s receiver_udp_args_t;
 
 void * receiver_udp_worker(void *);
-carbon_thread_t launch_receiver_udp_thread();
+carbon_thread_t * launch_receiver_udp_thread();
 
 #endif

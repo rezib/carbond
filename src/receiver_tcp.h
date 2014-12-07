@@ -31,6 +31,6 @@ struct receiver_tcp_args_s {
 
 typedef struct receiver_tcp_args_s receiver_tcp_args_t;
 
-carbon_thread_t launch_receiver_tcp_thread();
+carbon_thread_t * launch_receiver_tcp_thread();
 
 #endif

@@ -40,6 +40,6 @@ struct writer_thread_args {
 };
 
 void * writer_thread(void *);
-carbon_thread_t launch_writer_thread();
+carbon_thread_t * launch_writer_thread();
 
 #endif

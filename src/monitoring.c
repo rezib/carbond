@@ -112,17 +112,19 @@ void * monitoring_worker(void * arg) {
 
 }
 
-carbon_thread_t launch_monitoring_thread() {
+carbon_thread_t * launch_monitoring_thread() {
 
-    carbon_thread_t thread;
+    carbon_thread_t *thread;
     monitoring_args_t *args = calloc(1, sizeof(monitoring_args_t));
+
+    thread = calloc(1, sizeof(carbon_thread_t));
 
     /* initialize thread parameters */
     args->id_thread = 0;
 
-    thread.name = "monitoring";
+    thread->name = "monitoring";
 
-    if (pthread_create(&thread.pthread, NULL, monitoring_worker, (void*)args) != 0) {
+    if (pthread_create(&(thread->pthread), NULL, monitoring_worker, (void*)args) != 0) {
         error("error on pthread_create: %s\n", strerror(errno));
     }
 

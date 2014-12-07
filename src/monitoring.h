@@ -31,6 +31,6 @@ struct monitoring_args_s {
 typedef struct monitoring_args_s monitoring_args_t;
 
 void * monitoring_worker(void *);
-carbon_thread_t launch_monitoring_thread();
+carbon_thread_t * launch_monitoring_thread();
 
 #endif
