@@ -37,6 +37,10 @@
  */
 carbon_conf_t *conf = NULL;
 /*
+ * Initialize global threads variable
+ */
+carbon_threads_t *threads = NULL;
+/*
  * Initialize global monitoring db variable
  */
 monitoring_metrics_t *monitoring = NULL;
@@ -167,11 +171,6 @@ void sigint_handler() {
 
 int main(int argc, char *argv[]) {
 
-    carbon_thread_t *receiver_udp_thread,
-                    *receiver_tcp_thread,
-                    *writer_thread,
-                    *monitoring_thread;
-
     struct sigaction sa;
     int status = 0;
 
@@ -180,6 +179,7 @@ int main(int argc, char *argv[]) {
      */
 
     conf = calloc(1, sizeof(carbon_conf_t));
+    threads = calloc(1, sizeof(carbon_threads_t));
     monitoring = calloc(1, sizeof(monitoring_metrics_t));
 
     /* load default runtime configuration */
@@ -211,16 +211,16 @@ int main(int argc, char *argv[]) {
      */
 
     /* launch main threads */
-    monitoring_thread = launch_monitoring_thread();
-    receiver_udp_thread = launch_receiver_udp_thread();
-    receiver_tcp_thread = launch_receiver_tcp_thread();
-    writer_thread = launch_writer_thread();
+    threads->monitoring_thread = launch_monitoring_thread();
+    threads->receiver_udp_thread = launch_receiver_udp_thread();
+    threads->receiver_tcp_thread = launch_receiver_tcp_thread();
+    threads->writer_thread = launch_writer_thread();
 
     /* wait until end */
-    wait_thread(*receiver_udp_thread);
-    wait_thread(*receiver_tcp_thread);
-    wait_thread(*writer_thread);
-    wait_thread(*monitoring_thread);
+    wait_thread(*(threads->receiver_udp_thread));
+    wait_thread(*(threads->receiver_tcp_thread));
+    wait_thread(*(threads->writer_thread));
+    wait_thread(*(threads->monitoring_thread));
 
     debug("all threads terminated properly");
 

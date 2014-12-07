@@ -29,6 +29,19 @@ struct carbon_thread_s {
 
 typedef struct carbon_thread_s carbon_thread_t;
 
+/* carbon threads */
+
+struct carbon_threads_s {
+    carbon_thread_t *receiver_udp_thread;
+    carbon_thread_t *receiver_tcp_thread;
+    carbon_thread_t *writer_thread;
+    carbon_thread_t *monitoring_thread;
+};
+
+typedef struct carbon_threads_s carbon_threads_t;
+
+extern carbon_threads_t *threads;
+
 void block_signals();
 void wait_thread(carbon_thread_t);
 
