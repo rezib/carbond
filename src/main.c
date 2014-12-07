@@ -188,19 +188,19 @@ int main(int argc, char *argv[]) {
     parse_args(argc, argv);
 
     /* parse config files */
-    status = conf_parse_carbon_file();
+    status = conf_parse_carbon_file(conf);
     if (status) {
         error("error while parsing carbon configuration file\n");
         return EXIT_FAILURE;
     }
 
-    status = conf_parse_storage_schema_file();
+    status = conf_parse_storage_schema_file(conf);
     if (status) {
         error("error while parsing storage schema file\n");
         return EXIT_FAILURE;
     }
 
-    status = conf_parse_storage_aggregation_file();
+    status = conf_parse_storage_aggregation_file(conf);
     if (status) {
         error("error while parsing storage aggregation file\n");
         return EXIT_FAILURE;

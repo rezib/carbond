@@ -164,21 +164,21 @@ static retention_t * parse_retention_list_str(char *str_retention_list) {
  * Add new pattern_aggregation_t with values given in parameters at the end of
  * list conf->aggregation
  */
-void conf_add_pattern_aggregation(char *pattern, float xff, aggregation_type_t method) {
+static void conf_add_pattern_aggregation(carbon_conf_t *new_conf, char *pattern, float xff, aggregation_type_t method) {
 
    pattern_aggregation_t *agg = NULL;
 
    debug("adding new pattern aggregation: %s, %f, %d", pattern, xff, method);
 
-   if (conf->aggregation) {
+   if (new_conf->aggregation) {
        // go to last pattern_aggregation_t
-       agg = conf->aggregation;
+       agg = new_conf->aggregation;
        while(agg->next) agg = agg->next;
        agg->next = calloc(1, sizeof(pattern_aggregation_t));
        agg = agg->next;
    } else {
-       conf->aggregation = calloc(1, sizeof(pattern_aggregation_t));
-       agg = conf->aggregation;
+       new_conf->aggregation = calloc(1, sizeof(pattern_aggregation_t));
+       agg = new_conf->aggregation;
    }
 
    // copy pattern string
@@ -216,7 +216,7 @@ aggregation_type_t conf_get_aggregation_method(const char *method_s) {
  * Parses storage-aggregation.conf file in configuration directory and set
  * memory structures accordingly. Returns 0 on success, 1 on error.
  */
-int conf_parse_storage_aggregation_file () {
+int conf_parse_storage_aggregation_file (carbon_conf_t *new_conf) {
 
     const char *filename = "storage-aggregation.conf";
     char filepath[PATH_MAX]; // abs path to file
@@ -235,7 +235,7 @@ int conf_parse_storage_aggregation_file () {
      * make filepath contain the full absolute path to storage aggregation
      * configuration file
      */
-    strncpy(filepath, conf->conf_dir, strlen(conf->conf_dir));
+    strncpy(filepath, new_conf->conf_dir, strlen(new_conf->conf_dir));
     // if path doesn't end with '/' add it.
     if (filepath[strlen(filepath)] != '/')
         strncat(filepath, "/", 1);
@@ -276,7 +276,7 @@ int conf_parse_storage_aggregation_file () {
              * been found for new pattern_aggregation_t
              */
             if(!pattern_found) {
-                conf_add_pattern_aggregation(pattern, xff, method);
+                conf_add_pattern_aggregation(new_conf, pattern, xff, method);
             }
 
         }
@@ -293,7 +293,7 @@ int conf_parse_storage_aggregation_file () {
  * Parses storage-schemas.conf file in configuration directory and set
  * memory structures accordingly. Returns 0 on success, 1 on error.
  */
-int conf_parse_storage_schema_file() {
+int conf_parse_storage_schema_file(carbon_conf_t *new_conf) {
 
     const char *filename = "storage-schemas.conf";
     char filepath[PATH_MAX];
@@ -311,7 +311,7 @@ int conf_parse_storage_schema_file() {
      * make str_sch_filepath contain the full absolute path to storage schema
      * configuration file
      */
-    strncpy(filepath, conf->conf_dir, strlen(conf->conf_dir));
+    strncpy(filepath, new_conf->conf_dir, strlen(new_conf->conf_dir));
     if (filepath[strlen(filepath)] != '/')
         strncat(filepath, "/", 1);
     strncat(filepath, filename, strlen(filename));
@@ -338,7 +338,7 @@ int conf_parse_storage_schema_file() {
                 if (!first) {
                     first = calloc(1, sizeof(pattern_retention_t));
                     cur_pattern_retention = first;
-                    conf->schema = first;
+                    new_conf->schema = first;
                 } else {
                     cur_pattern_retention->next = calloc(1, sizeof(pattern_retention_t));
                     cur_pattern_retention = cur_pattern_retention->next;
@@ -367,7 +367,7 @@ int conf_parse_storage_schema_file() {
  * Parses carbon.conf file and conf members accordingly.
  * Returns 0 on success, 1 on error.
  */
-int conf_parse_carbon_file() {
+int conf_parse_carbon_file(carbon_conf_t *new_conf) {
 
     FILE *conf_fh = NULL;
     char *read_buffer = malloc(sizeof(char) * READ_BUF_MAX);
@@ -377,10 +377,10 @@ int conf_parse_carbon_file() {
 
     memset(read_buffer, 0, sizeof(char)*READ_BUF_MAX);
 
-    conf_fh = fopen(conf->conf_file, "r");
+    conf_fh = fopen(new_conf->conf_file, "r");
 
     if (!conf_fh) {
-        error("error while opening file %s: %s\n", conf->conf_file, strerror(errno));
+        error("error while opening file %s: %s\n", new_conf->conf_file, strerror(errno));
         return 1;
     }
 
@@ -397,22 +397,25 @@ int conf_parse_carbon_file() {
         if (cnf_key && cnf_val) {
 
             if (strncmp(cnf_key, "CONF_DIR", 8) == 0) {
-                free(conf->conf_dir);
-                conf->conf_dir = malloc(sizeof(char)*PATH_MAX);
-                memset(conf->conf_dir, 0, sizeof(char)*PATH_MAX);
-                strncpy(conf->conf_dir, cnf_val, strlen(cnf_val));
+                free(new_conf->conf_dir);
+                new_conf->conf_dir = NULL;
+                new_conf->conf_dir = malloc(sizeof(char)*PATH_MAX);
+                memset(new_conf->conf_dir, 0, sizeof(char)*PATH_MAX);
+                strncpy(new_conf->conf_dir, cnf_val, strlen(cnf_val));
             }
 
             else if (strncmp(cnf_key, "STORAGE_DIR", 11) == 0) {
-                free(conf->storage_dir);
-                conf->storage_dir = malloc(sizeof(char)*PATH_MAX);
-                memset(conf->storage_dir, 0, sizeof(char)*PATH_MAX);
-                strncpy(conf->storage_dir, cnf_val, strlen(cnf_val));
+                free(new_conf->storage_dir);
+                new_conf->storage_dir = NULL;
+                new_conf->storage_dir = malloc(sizeof(char)*PATH_MAX);
+                memset(new_conf->storage_dir, 0, sizeof(char)*PATH_MAX);
+                strncpy(new_conf->storage_dir, cnf_val, strlen(cnf_val));
+                debug("storage dir parsed from conf file: %s", new_conf->storage_dir);
             }
 
             else if (strncmp(cnf_key, "LINE_RECEIVER_PORT", 18) == 0) {
                 errno = 0;
-                conf->line_receiver_port = strtol(cnf_val, NULL, 10);
+                new_conf->line_receiver_port = strtol(cnf_val, NULL, 10);
                 if (errno)
                     switch(errno) {
                         case EINVAL:
@@ -424,7 +427,7 @@ int conf_parse_carbon_file() {
 
             else if (strncmp(cnf_key, "UDP_RECEIVER_PORT", 17) == 0) {
                 errno = 0;
-                conf->udp_receiver_port = strtol(cnf_val, NULL, 10);
+                new_conf->udp_receiver_port = strtol(cnf_val, NULL, 10);
                 if (errno)
                     switch(errno) {
                         case EINVAL:

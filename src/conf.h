@@ -36,15 +36,15 @@ uint32_t str_to_seconds(char *);
 
 /* storage schema */
 
-int conf_parse_storage_schema_file();
+int conf_parse_storage_schema_file(carbon_conf_t *);
 void print_storage_schema();
 
 /* storage aggregation */
-int conf_parse_storage_aggregation_file();
+int conf_parse_storage_aggregation_file(carbon_conf_t *);
 
 /* main configuration file */
 
 char * get_conf_value(const char *);
-int conf_parse_carbon_file();
+int conf_parse_carbon_file(carbon_conf_t *);
 
 #endif
