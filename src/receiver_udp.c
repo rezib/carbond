@@ -42,6 +42,7 @@ void * receiver_udp_worker(void * arg) {
     int n = 0; /* used to store message len */
     receiver_udp_args_t *worker_args = (receiver_udp_args_t *) arg;
     //int id_thread = worker_args->id_thread;
+    carbon_thread_t *me = worker_args->thread;
     int sockfd = worker_args->sockfd; /* fd on UDP socket */
 
     socklen_t len;
@@ -172,6 +173,7 @@ carbon_thread_t * launch_receiver_udp_thread() {
 
     /* initialize thread parameters */
     args->id_thread = 0;
+    args->thread = thread;
     args->sockfd = sockfd;
 
     thread->name = "UDP receiver";

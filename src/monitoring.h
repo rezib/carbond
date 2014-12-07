@@ -26,6 +26,7 @@
 
 struct monitoring_args_s {
     int id_thread;
+    carbon_thread_t *thread;
 };
 
 typedef struct monitoring_args_s monitoring_args_t;

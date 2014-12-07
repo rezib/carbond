@@ -26,6 +26,7 @@
 
 struct receiver_udp_args_s {
     int id_thread;
+    carbon_thread_t *thread;
     int sockfd;
 };
 

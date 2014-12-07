@@ -78,6 +78,7 @@ metric_t * find_largest_metric() {
 void * writer_thread(void * thread_args) {
 
     struct writer_thread_args * w_thd_args = (struct writer_thread_args *) thread_args;
+    carbon_thread_t *me = w_thd_args->thread;
     metric_t *max_m = NULL;
     /*
      * Blocks signals (SIGINT, SIGTERM, etc) in this thread so that they are all
@@ -113,6 +114,7 @@ carbon_thread_t *launch_writer_thread() {
 
     w_thd_args = (struct writer_thread_args *) malloc(sizeof(struct writer_thread_args));
     w_thd_args->id_thread = 0;
+    w_thd_args->thread = thread;
 
     if (pthread_create(&(thread->pthread), NULL, writer_thread, (void*)w_thd_args) != 0) {
         error("error on pthread_create: %s\n", strerror(errno));

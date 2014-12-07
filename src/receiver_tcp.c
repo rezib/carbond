@@ -38,6 +38,7 @@ void * receiver_tcp_worker(void * arg) {
 
     int n = 0; /* len of message sent by client */
     receiver_tcp_args_t *worker_args = (receiver_tcp_args_t *) arg;
+    carbon_thread_t *me = worker_args->thread;
     //int id_thread = worker_args->id_thread;
     int sockfd = worker_args->sockfd; /* fd on TCP socket */
     int conn; /* TCP connection */
@@ -197,6 +198,7 @@ carbon_thread_t * launch_receiver_tcp_thread() {
 
     /* initialize thread parameters */
     args->id_thread = 0;
+    args->thread = thread;
     args->sockfd = sockfd;
 
     thread->name = "TCP receiver";

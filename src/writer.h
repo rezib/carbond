@@ -37,6 +37,7 @@
 
 struct writer_thread_args {
     unsigned int id_thread;
+    carbon_thread_t *thread;
 };
 
 void * writer_thread(void *);

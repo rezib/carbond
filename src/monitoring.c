@@ -78,6 +78,7 @@ void * monitoring_worker(void * arg) {
 
     monitoring_args_t *worker_args = (monitoring_args_t *) arg;
     //int id_thread = worker_args->id_thread;
+    carbon_thread_t *me = worker_args->thread;
     struct timespec end, wait;
 
     /*
@@ -121,6 +122,7 @@ carbon_thread_t * launch_monitoring_thread() {
 
     /* initialize thread parameters */
     args->id_thread = 0;
+    args->thread = thread;
 
     thread->name = "monitoring";
 
