@@ -43,6 +43,6 @@ typedef struct carbon_threads_s carbon_threads_t;
 extern carbon_threads_t *threads;
 
 void block_signals();
-void wait_thread(carbon_thread_t);
+void threads_wait_all_stopped();
 
 #endif

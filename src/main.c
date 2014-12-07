@@ -216,12 +216,7 @@ int main(int argc, char *argv[]) {
     threads->receiver_tcp_thread = launch_receiver_tcp_thread();
     threads->writer_thread = launch_writer_thread();
 
-    /* wait until end */
-    wait_thread(*(threads->receiver_udp_thread));
-    wait_thread(*(threads->receiver_tcp_thread));
-    wait_thread(*(threads->writer_thread));
-    wait_thread(*(threads->monitoring_thread));
-
+    threads_wait_all_stopped();
     debug("all threads terminated properly");
 
     free(conf);

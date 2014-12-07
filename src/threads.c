@@ -45,14 +45,25 @@ void block_signals() {
     }
 
 }
-
 /*
  * Wait for a thread to stop
  */
-void wait_thread(carbon_thread_t thread) {
+static void thread_wait_stopped(carbon_thread_t *thread) {
 
-    pthread_join(thread.pthread, NULL);
+    pthread_join(thread->pthread, NULL);
+    debug("%s thread stopped.", thread->name);
 
-    debug("%s thread stopped.", thread.name);
+}
+
+/*
+ * Wait for all threads to stop
+ */
+void threads_wait_all_stopped() {
+
+    thread_wait_stopped(threads->receiver_udp_thread);
+    thread_wait_stopped(threads->receiver_tcp_thread);
+    thread_wait_stopped(threads->writer_thread);
+    thread_wait_stopped(threads->monitoring_thread);
+    debug("all threads are stopped");
 
 }
