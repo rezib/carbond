@@ -59,8 +59,12 @@ Roadmap
 * _ implement exclusive mode to cache files offset
 * _ make Python linked query thread optional at configure time
 * _ implement foreground/daemon (with logging to syslog)
-* _ handle SIGUP to reload configuration on the fly
-* _ internal counters threads with its own metrics
+* X handle SIGUP to reload configuration on the fly
+* X internal counters threads with its own metrics
+* X retry syscalls() on EINTR
+* X find autoconf macro to add -lpcre and -lpthread automatically
+* _ add thread launcher func pointer to factorize thread init
+* _ create function threads_init(); to initialize threads list
 
 ### `0.3`
 
