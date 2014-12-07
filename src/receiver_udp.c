@@ -176,7 +176,7 @@ carbon_thread_t * launch_receiver_udp_thread() {
     args->thread = thread;
     args->sockfd = sockfd;
 
-    thread->name = "UDP receiver";
+    thread_init(thread, "udp receiver");
 
     if (pthread_create(&(thread->pthread), NULL, receiver_udp_worker, (void*)args) != 0) {
         error("error on pthread_create: %s\n", strerror(errno));

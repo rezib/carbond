@@ -201,7 +201,7 @@ carbon_thread_t * launch_receiver_tcp_thread() {
     args->thread = thread;
     args->sockfd = sockfd;
 
-    thread->name = "TCP receiver";
+    thread_init(thread, "tcp receiver");
 
     if (pthread_create(&(thread->pthread), NULL, receiver_tcp_worker, (void*)args) != 0) {
         error("error on pthread_create: %s\n", strerror(errno));

@@ -45,6 +45,16 @@ void block_signals() {
     }
 
 }
+
+/*
+ * initialize carbon_thread_t members
+ */
+void thread_init(carbon_thread_t *thread, char *name) {
+
+    thread->name = name;
+
+}
+
 /*
  * Wait for a thread to stop
  */

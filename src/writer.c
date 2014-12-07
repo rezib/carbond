@@ -110,7 +110,7 @@ carbon_thread_t *launch_writer_thread() {
     struct writer_thread_args * w_thd_args = NULL;
 
     thread = calloc(1, sizeof(carbon_thread_t));
-    thread->name = "Writer";
+    thread_init(thread, "writer");
 
     w_thd_args = (struct writer_thread_args *) malloc(sizeof(struct writer_thread_args));
     w_thd_args->id_thread = 0;

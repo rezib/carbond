@@ -124,7 +124,7 @@ carbon_thread_t * launch_monitoring_thread() {
     args->id_thread = 0;
     args->thread = thread;
 
-    thread->name = "monitoring";
+    thread_init(thread, "monitoring");
 
     if (pthread_create(&(thread->pthread), NULL, monitoring_worker, (void*)args) != 0) {
         error("error on pthread_create: %s\n", strerror(errno));
