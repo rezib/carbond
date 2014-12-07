@@ -162,7 +162,7 @@ void parse_args(int argc, char * argv[]) {
  * SIGINT signal handler.
  * Basically set conf->run boolean to false in order to stop threads loops.
  */
-void sigint_handler() {
+void sigint_handler(int signb) {
 
     debug("received SIGINT, stopping all threads");
     conf->run = false;
