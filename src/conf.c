@@ -453,6 +453,34 @@ int conf_parse_carbon_file(carbon_conf_t *new_conf) {
 
 }
 
+int conf_parse(carbon_conf_t *new_conf) {
+
+    int status = 0;
+
+    /* parse config files */
+    status = conf_parse_carbon_file(new_conf);
+    if (status) {
+        error("error while parsing carbon configuration file\n");
+        goto end;
+    }
+
+    status = conf_parse_storage_schema_file(new_conf);
+    if (status) {
+        error("error while parsing storage schema file\n");
+        goto end;
+    }
+
+    status = conf_parse_storage_aggregation_file(new_conf);
+    if (status) {
+        error("error while parsing storage aggregation file\n");
+        goto end;
+    }
+
+    end:
+        return status;
+
+}
+
 /*
  * prints to stdout the linked list of pattern_retention_t with all their
  * retention_t members

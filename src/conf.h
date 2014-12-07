@@ -46,5 +46,6 @@ int conf_parse_storage_aggregation_file(carbon_conf_t *);
 
 char * get_conf_value(const char *);
 int conf_parse_carbon_file(carbon_conf_t *);
+int conf_parse(carbon_conf_t *);
 
 #endif
