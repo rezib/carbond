@@ -235,6 +235,7 @@ int conf_parse_storage_aggregation_file (carbon_conf_t *new_conf) {
      * make filepath contain the full absolute path to storage aggregation
      * configuration file
      */
+    memset(filepath, 0, sizeof(char)*PATH_MAX);
     strncpy(filepath, new_conf->conf_dir, strlen(new_conf->conf_dir));
     // if path doesn't end with '/' add it.
     if (filepath[strlen(filepath)] != '/')
@@ -304,13 +305,11 @@ int conf_parse_storage_schema_file(carbon_conf_t *new_conf) {
     pattern_retention_t *cur_pattern_retention = NULL,
                         *first = NULL;
 
-    // initialize allocated str
-    memset(filepath, 0, sizeof(char)*PATH_MAX);
-
     /*
-     * make str_sch_filepath contain the full absolute path to storage schema
+     * make filepath contain the full absolute path to storage schema
      * configuration file
      */
+    memset(filepath, 0, sizeof(char)*PATH_MAX);
     strncpy(filepath, new_conf->conf_dir, strlen(new_conf->conf_dir));
     if (filepath[strlen(filepath)] != '/')
         strncat(filepath, "/", 1);
