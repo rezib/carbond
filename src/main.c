@@ -37,6 +37,10 @@
  */
 carbon_conf_t *conf = NULL;
 /*
+ * Initialize global db variable
+ */
+metrics_database_t *db = NULL;
+/*
  * Initialize global threads variable
  */
 carbon_threads_t *threads = NULL;
@@ -125,11 +129,7 @@ void conf_copy(carbon_conf_t *orig_conf, carbon_conf_t *dest_conf) {
 }
 
 /*
- * Free memory allocated for runtime conf, except:
- * - db
- * Since this function is only used by conf_reload() and the db should not
- * be freed because it would result in an empty db and lost metrics data points
- * once threads restart.
+ * Free memory allocated for runtime conf.
  */
 void conf_free(carbon_conf_t *c) {
 
@@ -311,6 +311,7 @@ int main(int argc, char *argv[]) {
      */
 
     conf = calloc(1, sizeof(carbon_conf_t));
+    db = calloc(1, sizeof(metrics_database_t));
     threads = calloc(1, sizeof(carbon_threads_t));
     monitoring = calloc(1, sizeof(monitoring_metrics_t));
 
@@ -330,7 +331,7 @@ int main(int argc, char *argv[]) {
 
     check_whisper_sizes();
 
-    create_database();
+    database_init();
 
     /*
      *  signals handling

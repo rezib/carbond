@@ -38,15 +38,15 @@ void protocol_process_metric_line(char *metric_line) {
 
     //printf("parsed metric:%s timestamp:%u value:%f\n", metric_name, timestamp, value);
 
-    related_metric = get_metric(conf->db, metric_name);
+    related_metric = get_metric(db, metric_name);
 
     if(related_metric == NULL) { /* metric does not exist yet */
         related_metric = create_new_metric(metric_name);
-        add_database_metric(conf->db, related_metric);
+        add_database_metric(db, related_metric);
     }
     
     metric_point = create_new_metric_point(timestamp, value);
-    add_database_metric_point(conf->db, related_metric, metric_point);
+    add_database_metric_point(db, related_metric, metric_point);
 
     free(metric_name);
 }

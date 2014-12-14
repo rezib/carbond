@@ -111,7 +111,6 @@ typedef struct metric metric_t;
 struct carbon_conf_s {
     pattern_retention_t *schema;
     pattern_aggregation_t *aggregation;
-    metrics_database_t *db;
     char *conf_dir;
     char *conf_file;
     char *storage_dir;
@@ -138,5 +137,7 @@ typedef struct monitoring_metrics_s monitoring_metrics_t;
 extern carbon_conf_t *conf;
 
 extern monitoring_metrics_t *monitoring;
+
+extern metrics_database_t *db;
 
 #endif

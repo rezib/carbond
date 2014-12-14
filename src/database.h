@@ -31,6 +31,6 @@ void add_database_metric_point(metrics_database_t *, metric_t *, metric_point_t 
 void add_database_metric(metrics_database_t *, metric_t *);
 metric_point_t * create_new_metric_point(const uint32_t, const double);
 metric_t * create_new_metric(const char *);
-void create_database(void);
+void database_init();
 
 #endif

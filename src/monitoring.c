@@ -41,14 +41,14 @@ static void update_monitoring_metric(const char *name,
     metric_t *metric = NULL;
     metric_point_t *point = NULL;
 
-    metric = get_metric(conf->db, name);
+    metric = get_metric(db, name);
     if(metric == NULL) { /* metric does not exist yet */
         metric = create_new_metric(name);
-        add_database_metric(conf->db, metric);
+        add_database_metric(db, metric);
     }
 
     point = create_new_metric_point(timestamp, value);
-    add_database_metric_point(conf->db, metric, point);
+    add_database_metric_point(db, metric, point);
 
 }
 

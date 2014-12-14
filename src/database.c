@@ -94,10 +94,9 @@ metric_t * create_new_metric(const char *name) {
 
 }
 
-void create_database() {
+void database_init() {
 
-    conf->db = calloc(1, sizeof(metrics_database_t));
-    conf->db->first = NULL;
-    conf->db->last = NULL;
+    db->first = NULL;
+    db->last = NULL;
 
 }

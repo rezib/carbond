@@ -58,7 +58,7 @@ void write_metric(struct metric * m) {
  */
 metric_t * find_largest_metric() {
 
-    metric_t *cur_m = conf->db->first,
+    metric_t *cur_m = db->first,
              *max_m = NULL;
 
     uint32_t max_nb_points = 0;
