@@ -185,7 +185,8 @@ static inline int whisper_seek(int whisper_fd, int offset) {
 }
 
 /*
- * Seek to beginning of whisper file and read archive_info_t
+ * Seek to beginning of whisper file and read archive_info_t.
+ * Returns NULL if any error is encountered.
  */
 
 static whisper_metadata_t * whisper_read_metadata(int whisper_fd) {
@@ -211,7 +212,8 @@ static whisper_metadata_t * whisper_read_metadata(int whisper_fd) {
 }
 
 /*
- * Seek to archive header position in file and read archive_info_t
+ * Seek to archive header position in file and read archive_info_t.
+ * Returns NULL if any error is encountered.
  */
 
 static archive_info_t * whisper_read_archive_info(int whisper_fd, int archive_id) {
@@ -838,8 +840,14 @@ int whisper_write_value(const metric_t * metric,
 
     wsp_md = whisper_read_metadata(whisper_fd);
 
+    if (wsp_md == NULL)
+        return EXIT_FAILURE;
+
     /* TODO: check timestamp < wsp max retention of the highest precision archive */
     wsp_arch = whisper_read_archive_info(whisper_fd, 0);
+
+    if (wsp_arch == NULL)
+        return EXIT_FAILURE;
 
     /*
      * Align timestamp to archive sampling rate.
